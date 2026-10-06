@@ -1,5 +1,6 @@
 package ivs.games.accessories.backgammonboard.standard;
 
+import ivs.games.accessories.backgammonboard.BoardCellView;
 import ivs.games.accessories.backgammonboard.Checker;
 import ivs.games.accessories.backgammonboard.CheckerColor;
 import lombok.Getter;
@@ -31,17 +32,58 @@ public class ColoredCell<P extends Checker<?, ?>> extends StandardCell<P> {
     private final CheckerColor color;
 
     /**
-     * Creates a copy of the supplied cell, preserving its color and checker order.
+     * Creates an independent copy of the supplied colored cell.
      *
-     * <p>Subsequent changes to either cell do not affect the other.
+     * <p>The configured color and checker order are preserved.
      * Immutable checker and color objects are shared.</p>
      *
-     * @param cell the cell to copy
-     * @throws NullPointerException if {@code cell} is {@code null}
+     * @param source the cell to copy
+     * @throws NullPointerException     if {@code source} is {@code null}
+     * @throws IllegalArgumentException if a source checker has a different color
      */
-    public ColoredCell(@NonNull ColoredCell<P> cell) {
-        super(cell);
-        this.color = cell.color;
+    public ColoredCell(@NonNull ColoredCell<P> source) {
+        this(source.getColor(), source.getState());
+    }
+
+    /**
+     * Creates a cell of the specified color and copies the source contents.
+     *
+     * <p>Checker order is preserved. Subsequent changes to either cell
+     * do not affect the other. Immutable checker objects are shared.</p>
+     *
+     * @param color  the color accepted by this cell
+     * @param source the cell to copy
+     * @throws NullPointerException     if either argument is {@code null}
+     * @throws IllegalArgumentException if a source checker has a different color
+     */
+    public ColoredCell(
+            @NonNull CheckerColor color,
+            @NonNull BoardCellView<P> source) {
+
+        this(color, source.getState());
+    }
+
+    /**
+     * Creates a cell of the specified color from the supplied checker list.
+     *
+     * <p>Checkers are ordered from bottom to top; the last element becomes
+     * the top checker. An empty list creates an empty cell.</p>
+     *
+     * <p>The list contents are copied. Subsequent changes to the supplied list
+     * do not affect the cell. Immutable checker objects are shared.</p>
+     *
+     * @param color    the color accepted by this cell
+     * @param checkers the initial cell contents
+     * @throws NullPointerException     if {@code color}, {@code checkers},
+     *                                  or any checker is {@code null}
+     * @throws IllegalArgumentException if any checker has a different color
+     */
+    public ColoredCell(
+            @NonNull CheckerColor color,
+            @NonNull List<P> checkers) {
+
+        this.color = color;
+        setState(checkers);
     }
 
     /**

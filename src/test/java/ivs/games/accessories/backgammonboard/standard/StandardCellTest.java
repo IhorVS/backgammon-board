@@ -1,5 +1,6 @@
 package ivs.games.accessories.backgammonboard.standard;
 
+import ivs.games.accessories.backgammonboard.BoardCellView;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -198,8 +199,26 @@ class StandardCellTest {
 
     @Test
     void rejectsNullCopySource() {
-        assertThrows(NullPointerException.class,
-                () -> new StandardCell<TestChecker>(null));
+        assertThrows(NullPointerException.class, () -> new StandardCell<>((BoardCellView<?>) null));
+    }
+
+    @Test
+    void rejectsNullCheckerList() {
+        assertThrows(NullPointerException.class, () -> new StandardCell<>((List<TestChecker>) null));
+    }
+
+    @Test
+    void rejectsCheckerListWithNullElement() {
+        List<TestChecker> supplied = new ArrayList<>();
+        supplied.add(TestChecker.WHITE_MAN);
+        supplied.add(TestChecker.WHITE_MAN);
+        supplied.add(null);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> new StandardCell<>(supplied));
+
+        assertEquals("Checker at index 2 is null", exception.getMessage());
     }
 
     @Test

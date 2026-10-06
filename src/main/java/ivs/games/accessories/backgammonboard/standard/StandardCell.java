@@ -11,6 +11,7 @@ import org.apache.commons.lang3.Validate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 /**
  * A standard mutable cell containing a stack of checkers.
@@ -40,6 +41,30 @@ public class StandardCell<P extends Checker<?, ?>> implements BoardCell<P> {
      */
     public StandardCell(@NonNull BoardCellView<P> cellView) {
         this.checkers.addAll(cellView.getState());
+    }
+
+    /**
+     * Creates a cell containing a copy of the supplied checker list.
+     *
+     * <p>Checkers are ordered from bottom to top; the last element
+     * becomes the top checker. An empty list creates an empty cell.</p>
+     *
+     * <p>Subsequent changes to the supplied list do not affect the cell.
+     * Immutable checker objects are shared.</p>
+     *
+     * @param checkers the initial cell contents
+     * @throws NullPointerException     if {@code checkers} is {@code null}
+     * @throws IllegalArgumentException if any element is {@code null}
+     */
+    public StandardCell(@NonNull List<P> checkers) {
+        IntStream.range(0, checkers.size())
+                .filter(index -> checkers.get(index) == null)
+                .findFirst()
+                .ifPresent(index -> {
+                    throw new IllegalArgumentException("Checker at index %d is null".formatted(index));
+                });
+
+        this.checkers.addAll(checkers);
     }
 
     /** {@inheritDoc} */
