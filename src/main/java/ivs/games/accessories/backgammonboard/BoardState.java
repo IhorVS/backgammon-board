@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  *
  * @param <P> the type of checkers contained in this state
  */
+@SuppressWarnings("ClassCanBeRecord")
 public class BoardState<P extends Checker<?, ?>> {
 
     private final List<List<P>> cells;
