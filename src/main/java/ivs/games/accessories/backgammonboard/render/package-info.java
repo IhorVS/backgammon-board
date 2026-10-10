@@ -1,9 +1,13 @@
 /**
  * Plain-text rendering of standard backgammon boards for logs and consoles.
  *
- * <p>The renderer captures a board state and displays technical indices 12 to 23
- * across the upper row and 11 to 0 across the lower row. Stack bottoms are at the
- * outer board edges; stack tops face the center.</p>
+ * <p>The renderer captures a board state and displays technical indices 23 to 12
+ * across the upper row and 0 to 11 across the lower row, both from left to right.
+ * Index 0 is at the lower-left corner. Indices increase counterclockwise along
+ * the lower edge to the right, then along the upper edge to the left.
+ * This display orientation does not determine checker movement directions.</p>
+ *
+ * <p>Stack bottoms are at the outer board edges; stack tops face the center.</p>
  *
  * <p>Each half has at least five checker rows and expands independently to fit
  * its tallest stack. One blank board row separates the halves. Empty positions

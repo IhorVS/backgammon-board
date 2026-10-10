@@ -33,7 +33,7 @@ After installation, another project can use:
 ## Packages
 
 | Package under `ivs.games.accessories.backgammonboard` | Contents                                                                    |
-|-------------------------------------------------------|-----------------------------------------------------------------------------|
+| ----------------------------------------------------- | --------------------------------------------------------------------------- |
 | Root                                                  | Checker, color, and type contracts; cell and board interfaces; `BoardState` |
 | `standard`                                            | Standard enums, cells, `StandardBoard`, and `StandardBoardBuilder`          |
 | `render`                                              | `StandardBoardRenderer` for console and log output                          |
@@ -41,7 +41,7 @@ After installation, another project can use:
 ## Standard checkers
 
 | Constant     | Code | Type         | Color         |
-|--------------|------|--------------|---------------|
+| ------------ | ---- | ------------ | ------------- |
 | `WHITE_MAN`  | `WM` | `MAN` (`M`)  | `WHITE` (`W`) |
 | `WHITE_EMIR` | `WE` | `EMIR` (`E`) | `WHITE` (`W`) |
 | `BLACK_MAN`  | `BM` | `MAN` (`M`)  | `BLACK` (`B`) |
@@ -66,7 +66,7 @@ Each special cell belongs to one standard color.
 Indices are stable technical addresses. The game engine maps game-specific routes to these indices.
 
 | Interface                | Access                                                                   |
-|--------------------------|--------------------------------------------------------------------------|
+| ------------------------ | ------------------------------------------------------------------------ |
 | `BoardCellView<P>`       | Size, emptiness, top checker and color, snapshot, color count, traversal |
 | `BoardCell<P>`           | View operations plus `push`, `pop`, `setState`, and `clear`              |
 | `BackgammonBoardView<P>` | Cell views, board emptiness, playing cell count, traversal, snapshot     |
@@ -170,13 +170,17 @@ System.out.println(text);
 
 The renderer obtains a state snapshot and displays technical indices:
 
-- Upper row: `12–23`, from left to right.
-- Lower row: `11–0`, from left to right.
+- Upper row: `23–12`, from left to right.
+- Lower row: `0–11`, from left to right.
 - Stack bottoms at the outer edges, stack tops towards the center.
 - At least five checker rows per half; each half expands independently for larger stacks.
 - One blank board row between halves; `..` marks empty positions.
 - Bars and borne-off areas below the board, with complete bottom-to-top lists and checker counts.
 - Counts right-aligned in a field of at least two characters; black sections aligned across both lines.
+
+Index `0` is at the lower-left corner. Indices increase counterclockwise: along the lower edge
+to the right, then along the upper edge to the left. This display orientation does not determine
+checker movement directions; those belong to the game engine.
 
 Codes must be non-empty and contain no whitespace. Column width accommodates longer playing
 checker codes; alignment assumes one console column per character.

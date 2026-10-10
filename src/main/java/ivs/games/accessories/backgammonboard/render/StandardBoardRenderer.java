@@ -18,8 +18,11 @@ import java.util.stream.IntStream;
  * Renders standard backgammon boards as plain text.
  *
  * <p>Playing cells use their technical board indices.
- * The upper row displays indices 12 through 23 from left to right.
- * The lower row displays indices 11 through 0 from left to right.</p>
+ * The upper row displays indices 23 through 12 from left to right.
+ * The lower row displays indices 0 through 11 from left to right.
+ * Index 0 is at the lower-left corner. Indices increase along the lower
+ * edge to the right, then along the upper edge to the left.
+ * This layout does not determine checker movement directions.</p>
  *
  * <p>Checkers are displayed individually, with the bottom of each stack
  * at the outer board edge and the top towards the center.
@@ -147,6 +150,14 @@ public class StandardBoardRenderer {
     }
 
     /*
+     * Returns the board index for a displayed column.
+     * Upper indices decrease from left to right; lower indices increase.
+     */
+    private static int getCellIndex(boolean upper, int column) {
+        return upper ? StandardBoard.PLAYING_CELL_COUNT - 1 - column : column;
+    }
+
+    /*
      * Writes technical cell indices using the same column widths
      * and group spacing as the checker rows.
      */
@@ -160,7 +171,7 @@ public class StandardBoardRenderer {
                 result.append(column == GROUP_CELL_COUNT ? "   " : CELL_SEPARATOR);
             }
 
-            int index = upper ? HALF_CELL_COUNT + column : HALF_CELL_COUNT - 1 - column;
+            int index = getCellIndex(upper, column);
             result.append(String.format(Locale.ROOT, format, index));
         }
 
@@ -173,13 +184,7 @@ public class StandardBoardRenderer {
      * Unoccupied positions are filled with the empty-slot marker.
      */
     @SuppressWarnings("StringRepeatCanBeUsed")
-    private void appendHalf(
-            StringBuilder result,
-            List<List<String>> cells,
-            boolean upper,
-            int height,
-            int cellWidth) {
-
+    private void appendHalf(StringBuilder result, List<List<String>> cells, boolean upper, int height, int cellWidth) {
         for (int row = 0; row < height; row++) {
             int checkerIndex = upper ? row : height - 1 - row;
 
@@ -190,7 +195,7 @@ public class StandardBoardRenderer {
                     result.append(column == GROUP_CELL_COUNT ? " | " : CELL_SEPARATOR);
                 }
 
-                int cellIndex = upper ? HALF_CELL_COUNT + column : HALF_CELL_COUNT - 1 - column;
+                int cellIndex = getCellIndex(upper, column);
                 List<String> checkers = cells.get(cellIndex);
                 String code = checkerIndex < checkers.size() ? checkers.get(checkerIndex) : EMPTY_SLOT;
 
