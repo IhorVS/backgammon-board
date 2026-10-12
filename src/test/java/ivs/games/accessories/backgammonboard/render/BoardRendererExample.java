@@ -9,8 +9,12 @@ import lombok.NoArgsConstructor;
 import java.util.Collections;
 import java.util.List;
 
-import static ivs.games.accessories.backgammonboard.standard.StandardChecker.*;
-import static ivs.games.accessories.backgammonboard.standard.StandardCheckerColor.*;
+import static ivs.games.accessories.backgammonboard.standard.StandardChecker.BLACK_EMIR;
+import static ivs.games.accessories.backgammonboard.standard.StandardChecker.BLACK_MAN;
+import static ivs.games.accessories.backgammonboard.standard.StandardChecker.WHITE_EMIR;
+import static ivs.games.accessories.backgammonboard.standard.StandardChecker.WHITE_MAN;
+import static ivs.games.accessories.backgammonboard.standard.StandardCheckerColor.BLACK;
+import static ivs.games.accessories.backgammonboard.standard.StandardCheckerColor.WHITE;
 
 /**
  * Demonstrates rendering an arbitrary board arrangement.

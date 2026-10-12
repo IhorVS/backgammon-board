@@ -60,7 +60,7 @@ public class StandardBoardRenderer {
      *
      * @param board the board to render
      * @return the rendered board
-     * @throws NullPointerException if {@code board} is {@code null}
+     * @throws NullPointerException     if {@code board} is {@code null}
      * @throws IllegalArgumentException if the playing cell count is not 24
      *                                  or a checker code is empty or contains whitespace
      */

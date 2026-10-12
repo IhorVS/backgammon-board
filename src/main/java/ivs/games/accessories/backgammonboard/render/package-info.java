@@ -5,7 +5,9 @@
  * across the upper row and 0 to 11 across the lower row, both from left to right.
  * Index 0 is at the lower-left corner. Indices increase counterclockwise along
  * the lower edge to the right, then along the upper edge to the left.
- * This display orientation does not determine checker movement directions.</p>
+ * This display orientation does not determine checker movement directions.
+ * The renderer displays absolute indices and does not apply
+ * {@link ivs.games.accessories.backgammonboard.BoardAddressing} mappings.</p>
  *
  * <p>Stack bottoms are at the outer board edges; stack tops face the center.</p>
  *

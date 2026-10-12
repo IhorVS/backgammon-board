@@ -1,7 +1,8 @@
 # Backgammon Board
 
 Java 21 accessories for backgammon games: immutable checker definitions, stack cells,
-mutable boards, immutable state snapshots, a reusable board builder, and a plain-text renderer.
+mutable boards, immutable state snapshots, a reusable board builder, side-relative addressing,
+and a plain-text renderer.
 
 The library stores and moves checkers. A game engine defines legal moves, initial arrangements,
 movement directions, dice handling, and victory conditions.
@@ -11,6 +12,7 @@ movement directions, dice handling, and victory conditions.
 - JDK 21.
 - Maven.
 - Apache Commons Lang for validation and Lombok for generated members.
+- Guava for bidirectional addressing maps.
 - JUnit 5 and Mockito for tests.
 
 Build and install the library locally:
@@ -32,11 +34,11 @@ After installation, another project can use:
 
 ## Packages
 
-| Package under `ivs.games.accessories.backgammonboard` | Contents                                                                    |
-| ----------------------------------------------------- | --------------------------------------------------------------------------- |
-| Root                                                  | Checker, color, and type contracts; cell and board interfaces; `BoardState` |
-| `standard`                                            | Standard enums, cells, `StandardBoard`, and `StandardBoardBuilder`          |
-| `render`                                              | `StandardBoardRenderer` for console and log output                          |
+| Package under `ivs.games.accessories.backgammonboard` | Contents                                                                                       |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Root                                                  | Checker, color, and type contracts; cell and board interfaces; `BoardState`; `BoardAddressing` |
+| `standard`                                            | Standard enums, cells, `StandardBoard`, and `StandardBoardBuilder`                             |
+| `render`                                              | `StandardBoardRenderer` for console and log output                                             |
 
 ## Standard checkers
 
@@ -63,7 +65,25 @@ Custom immutable checkers can implement `Checker<T, C>` with their own type and 
 
 A `StandardBoard` contains 24 playing cells (`0–23`), two bars, and two borne-off cells.
 Each special cell belongs to one standard color.
-Indices are stable technical addresses. The game engine maps game-specific routes to these indices.
+Indices are stable technical addresses and do not depend on the acting side.
+A cell can be accessed directly by its absolute index:
+
+```java
+board.getCell(0); // The playing cell at absolute index 0.
+```
+
+In the standard renderer, the absolute indices are arranged as follows:
+
+- Lower edge, from left to right: `0–11`.
+- Upper edge, from left to right: `23–12`.
+- Index `0` is at the lower-left corner; indices increase counterclockwise around the board.
+
+This is a display convention; the board stores an indexed sequence of cells.
+It does not assign movement directions to players.
+
+`BoardAddressing<S>` is optional. Use it when commands or displayed positions need route points
+relative to a side. It converts those points to the same absolute indices used by `getCell(index)`.
+Direct access does not require an addressing component.
 
 | Interface                | Access                                                                   |
 | ------------------------ | ------------------------------------------------------------------------ |
@@ -89,6 +109,55 @@ Changes made through mutable references remain visible through previously obtain
 Board `forEachCell()` visits only playing cells, including empty ones, in ascending index order.
 Do not modify cells during traversal callbacks. `isEmpty()` checks all board areas.
 `clear()` empties every area while preserving cell references.
+
+## Side-relative addressing
+
+`BoardAddressing<S>` translates route points `1–24` into absolute playing cell indices `0–23`
+and back. The constructor accepts two distinct side identifiers and one Guava `BiMap<Integer, Integer>`
+for each side. Keys are route points; values are board indices. Side identifiers may be standard
+checker colors or any other immutable values supplied by the game; equality is checked with `equals()`.
+
+Each mapping must contain all 24 route points and all 24 board indices exactly once.
+Any permutation is supported, and the two sides may use identical mappings.
+The component copies both mappings into `ImmutableBiMap` instances. Subsequent changes to the
+supplied maps do not affect conversions. Side identifiers are shared and must remain immutable.
+
+For example, a long-backgammon game can configure white's route directly and shift black's route
+by twelve cells. This is an example configuration, not a route built into the library:
+
+```java
+import com.google.common.collect.ImmutableBiMap;
+import ivs.games.accessories.backgammonboard.BoardAddressing;
+import ivs.games.accessories.backgammonboard.standard.StandardCheckerColor;
+
+import static ivs.games.accessories.backgammonboard.standard.StandardCheckerColor.*;
+
+ImmutableBiMap.Builder<Integer, Integer> whiteRoute = ImmutableBiMap.builder();
+ImmutableBiMap.Builder<Integer, Integer> blackRoute = ImmutableBiMap.builder();
+
+for (int point = 1; point <= BoardAddressing.PLAYING_CELL_COUNT; point++) {
+    int index = point - 1;
+    whiteRoute.put(point, index);
+    blackRoute.put(point, (index + 12) % BoardAddressing.PLAYING_CELL_COUNT);
+}
+
+BoardAddressing<StandardCheckerColor> addressing = new BoardAddressing<>(
+        WHITE, whiteRoute.build(), BLACK, blackRoute.build());
+
+int whiteStart = addressing.toBoardIndex(WHITE, 1);  // 0
+int blackStart = addressing.toBoardIndex(BLACK, 1);  // 12
+int blackPoint = addressing.toRoutePoint(BLACK, 0); // 13
+```
+
+Before accessing a cell, the engine converts a command's route point with `toBoardIndex(side, point)`.
+To report a cell using a side's route, it calls `toRoutePoint(side, index)`.
+Both methods reject unknown sides and out-of-range arguments with `IllegalArgumentException`;
+null sides cause `NullPointerException`. Construction also rejects equal sides, incomplete or
+out-of-range mappings, and null arguments, keys, or values.
+
+Addressing covers playing cells only. Bars and borne-off cells remain addressed by color.
+The component neither changes the board nor validates moves, captures, dice usage, or victory.
+The game supplies the route mappings and decides how route points are used during play.
 
 ## Build a board
 
@@ -181,6 +250,7 @@ The renderer obtains a state snapshot and displays technical indices:
 Index `0` is at the lower-left corner. Indices increase counterclockwise: along the lower edge
 to the right, then along the upper edge to the left. This display orientation does not determine
 checker movement directions; those belong to the game engine.
+The renderer always displays absolute indices and does not apply `BoardAddressing` mappings.
 
 Codes must be non-empty and contain no whitespace. Column width accommodates longer playing
 checker codes; alignment assumes one console column per character.
@@ -196,6 +266,8 @@ Standard boards, cells, and builders are mutable and not thread-safe.
 Do not modify a board while copying it, capturing its state, or rendering it.
 Immutable states can be shared when checker and color implementations, including subclass properties,
 respect their immutability contracts. The renderer has no mutable instance state.
+`BoardAddressing` is immutable and thread-safe when its side identifiers satisfy the immutability contract.
+Do not modify supplied addressing maps while the component is being constructed.
 
 ## License
 
