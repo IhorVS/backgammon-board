@@ -8,18 +8,37 @@
     <artifactId>backgammon-board</artifactId>
     <version>1.0.0</version>
 
+    <name>Backgammon Board</name>
+    <description>Java 21 library for backgammon checkers, board state, addressing, and rendering.</description>
+    <url>https://github.com/IhorVS/backgammon-board</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/IhorVS/backgammon-board/blob/main/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <developers>
         <developer>
+            <id>IhorVS</id>
             <name>Ihor Shaniuk</name>
             <url>https://github.com/IhorVS</url>
         </developer>
     </developers>
 
+    <scm>
+        <connection>scm:git:https://github.com/IhorVS/backgammon-board.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/IhorVS/backgammon-board.git</developerConnection>
+        <url>https://github.com/IhorVS/backgammon-board</url>
+    </scm>
+
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <guava.version>33.7.2-jre</guava.version>
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <lombok.version>1.18.32</lombok.version>
         <junit.jupiter.version>5.12.2</junit.jupiter.version>
@@ -27,6 +46,7 @@
 
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
         <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
+        <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
     </properties>
 
     <dependencies>
@@ -34,7 +54,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.7.2-jre</version>
+            <version>${guava.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -90,6 +110,11 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
             </plugin>
             <!-- Generates and attaches a source JAR for publishing and IDE navigation. -->
             <plugin>
