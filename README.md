@@ -10,18 +10,23 @@ movement directions, dice handling, and victory conditions.
 ## Requirements and build
 
 - JDK 21.
-- Maven.
 - Apache Commons Lang for validation and Lombok for generated members.
 - Guava for bidirectional addressing maps.
 - JUnit 5 and Mockito for tests.
 
+The Maven Wrapper downloads the project's pinned Maven version on first use.
 Build and install the library locally:
 
 ```shell
-mvn clean install
+# Linux and macOS
+sh ./mvnw clean install
+
+# Windows PowerShell
+.\mvnw.cmd clean install
 ```
 
 The Maven configuration also attaches a source JAR.
+GitHub Actions runs `verify` on pushes and pull requests using JDK 21.
 After installation, another project can use:
 
 ```xml
